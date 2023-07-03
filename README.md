@@ -7,3 +7,5 @@ npm install
 ```sh
 DEBUG=BasilAppBackEnd:* npm start
 ```
+
+[NET Copyright](https://netbible.com/copyright/)
