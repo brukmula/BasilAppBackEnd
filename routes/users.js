@@ -47,8 +47,9 @@ app.post('/signup', (req, res) => {
 
   firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // User created successfully
-        res.send('User created successfully!');
+          // User created successfully
+          console.log(userCredential)
+          res.send(userCredential);
       })
       .catch((error) => {
         // Error creating user
@@ -64,7 +65,8 @@ app.post('/signin', (req, res) => {
         .then((userCredential) => {
             // User signed in successfully
             const user = userCredential.user;
-            res.send(`Successfully signed in ${user.email}`);
+            console.log(`Successfully signed in ${user.email}`);
+            res.send(userCredential);
         })
         .catch((error) => {
             // Error signing in user
