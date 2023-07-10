@@ -3,12 +3,15 @@ const cors = require('cors');
 const compression = require('compression')
 const express = require('express');
 const helmet = require('helmet');
+
+const NET = require("../bibles/net");
+const net_bible_obj = new NET();
 // const morgan = require('morgan');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-async function net_bible(book, chapter) {
+async function net_bible_old(book, chapter) {
   try {
     const response = await fetch(`https://labs.bible.org/api/?passage=${book}%20${chapter}&type=json`);
     return await response.json();
@@ -33,13 +36,14 @@ app.use(compression());
 // TODO: Use later // adding morgan to log HTTP requests
 // app.use(morgan('combined'));
 
-// http://127.0.0.1:3000/api/bible/?book=john&chapter=3
+// http://127.0.0.1:3000/api/bible/?book=John&chapter=3
 app.get('/api/bible', (req, res) => {
+  console.log(req.query);
   let book = req.query.book;
   console.log(book);
   let chapter = req.query.chapter;
   console.log(chapter);
-  net_bible(book, chapter).then( (data) => res.send(data) );
+  net_bible_obj.get_passage(book, chapter).then( (data) => res.send(data) );
 });
 
 // starting the server
