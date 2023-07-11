@@ -17,4 +17,18 @@ DEBUG=BasilAppBackEnd:* npm start
 node app.js
 ```
 
+# Dockerize!
+#### Build the container
+```shell
+docker build -t basil-backend .
+``` 
+
+##### Run the container (detached)
+```shell
+docker run -d -p 3000:3000 -p 3001:3001 \
+       --restart=unless-stopped \
+       --name basil-backend \
+       basil-backend
+```
+
 [NET Copyright](https://netbible.com/copyright/)
