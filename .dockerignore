@@ -1,0 +1,10 @@
+# IntelliJ project files
+.idea
+*.iml
+
+# Unneccesary/redundant project files:
+node_modules
+tests
+README.md
+.gitignore
+.dockerignore
