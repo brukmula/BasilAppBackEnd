@@ -42,37 +42,44 @@ app.get('/signup', function(req, res, next) {
 });
 
 app.post('/signup', (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+    console.log(req.get('Content-Type'));
+    const email = req.header('email');
+    const password = req.header('password');
 
-  firebase.auth().createUserWithEmailAndPassword(email, password)
+    // TODO: Add more email filtering (regex/firebase) and more informative response
+    if (email.length < 8 || password.length < 8) {
+        res.send("Invalid email or password length")
+    }
+
+    firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
           // User created successfully
           console.log(userCredential)
-          res.send(userCredential);
+          res.status(201).send(userCredential);
       })
       .catch((error) => {
         // Error creating user
-        res.send(`Error creating user: ${error.message}`);
+        res.status(400).send(`Error creating user: ${error.message}`);
       });
 });
 
 app.post('/signin', (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+    console.log(req.get('Content-Type')); // Just to see what we are getting
+    const email = req.header('email');
+    const password = req.header('password');
 
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             // User signed in successfully
             const user = userCredential.user;
             console.log(`Successfully signed in ${user.email}`);
-            res.send(userCredential);
+            res.status(200).send(userCredential);
         })
         .catch((error) => {
             // Error signing in user
             const errorCode = error.code;
             const errorMessage = error.message;
-            res.send(error);
+            res.status(500).send(error);    // We can parse different errors later
             console.log(errorCode, errorMessage);
         });
 
