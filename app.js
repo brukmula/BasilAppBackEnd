@@ -7,7 +7,7 @@ const path = require('path');
 
 // Routes
 const bibleRouter = require('./routes/bible');
-const indexRouter = require('./routes/index');
+// const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
 // App
@@ -23,11 +23,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+const port = process.env.PORT || 3000;
 
 // Routes usage
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/api', bibleRouter);
-app.use('/login', usersRouter);
+app.use('/', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -43,6 +44,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.listen(port, () => {
+  console.log(`API server listening on port ${port}`);
 });
 
 module.exports = app;

@@ -33,14 +33,17 @@ app.use(
 );
 
 
+// http://127.0.0.1:3000/login
 app.get('/login', function(req, res, next) {
   res.render('login', { title: 'Login' });
 });
 
+// http://127.0.0.1:3000/signup
 app.get('/signup', function(req, res, next) {
   res.render('signup', { title: 'Login' });
 });
 
+// get user data for auth
 app.post('/signup', (req, res) => {
     console.log(req.get('Content-Type'));
     const email = req.header('email');
@@ -63,6 +66,7 @@ app.post('/signup', (req, res) => {
       });
 });
 
+// get user data to create an account
 app.post('/signin', (req, res) => {
     console.log(req.get('Content-Type')); // Just to see what we are getting
     const email = req.header('email');
@@ -85,8 +89,9 @@ app.post('/signin', (req, res) => {
 
 });
 
+/*
 app.listen(port, () => {
   console.log(`Login server listening on port ${port}`);
-});
+}); */
 
 module.exports = app;
