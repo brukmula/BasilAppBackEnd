@@ -51,7 +51,7 @@ on:
 
 env:
   PROJECT_ID: basil-backend-47d01
-  GAR_LOCATION: us-central1-docker.pkg.dev/basil-backend-47d01/basil-backend
+  GAR_LOCATION: us-central1
   SERVICE: basil-backend
   REGION: us-central1
 
