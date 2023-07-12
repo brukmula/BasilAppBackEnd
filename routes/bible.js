@@ -8,7 +8,7 @@ const NET = require("../bibles/net");
 const net_bible_obj = new NET();
 // const morgan = require('morgan');
 
-const app = express();
+const app = express.Router();
 const port = process.env.PORT || 3000;
 
 async function net_bible_old(book, chapter) {
@@ -37,7 +37,7 @@ app.use(compression());
 // app.use(morgan('combined'));
 
 // http://127.0.0.1:3000/api/bible/?book=John&chapter=3
-app.get('/api/bible', (req, res) => {
+app.get('/bible', (req, res) => {
   console.log(req.query);
   let book = req.query.book;
   console.log(book);
@@ -47,8 +47,8 @@ app.get('/api/bible', (req, res) => {
 });
 
 // starting the server
-app.listen(port, () => {
+/* app.listen(port, () => {
   console.log(`API server listening on port ${port}`);
-});
+}); */
 
 module.exports = app;
