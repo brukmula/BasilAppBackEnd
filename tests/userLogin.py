@@ -1,6 +1,6 @@
 import requests
 
-uri = "http://127.0.0.1:3001/signin"
+uri = "http://127.0.0.1:3000/signin"
 
 if __name__ == '__main__':
     headers: dict = {
