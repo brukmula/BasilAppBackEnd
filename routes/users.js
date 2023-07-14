@@ -39,19 +39,6 @@ app.use(
     })
 );
 
-
-// http://127.0.0.1:3000/login
-/* Doesn't work. TODO: Remove
-app.get('/login', function(req, res, next) {
-  res.render('login', { title: 'Login' });
-}); */
-
-// http://127.0.0.1:3000/signup
-/* Doesn't work. TODO: Remove
-app.get('/signup', function(req, res, next) {
-  res.render('signup', { title: 'Login' });
-}); */
-
 // get user data for auth
 app.post('/signup', (req, res) => {
     console.log(req.get('Content-Type'));
@@ -145,10 +132,5 @@ app.post('/update-profile', (req, res) => {
         res.status(401).send("No user authorization was sent");
     }
 });
-
-/*
-app.listen(port, () => {
-  console.log(`Login server listening on port ${port}`);
-}); */
 
 module.exports = app;
