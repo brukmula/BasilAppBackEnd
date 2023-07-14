@@ -1,4 +1,4 @@
-FROM node:11-alpine
+FROM node:18-alpine
 LABEL authors="Samuel Howard"
 
 # Create app directory
