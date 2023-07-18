@@ -139,7 +139,65 @@ app.post('/update-profile', (req, res) => {
         });
     } else {
         // No token was sent in the request.
-        res.status(401).send("No user authorization was sent");
+        res.status(401).send("No user token was sent");
+    }
+});
+
+app.get('/streak', (req, res) => {
+    // Firebase user credential
+    const user_in = req.header('user');
+
+    // Make sure the user credentials were passed
+    if (user_in) {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const streak_ref = db.ref(`streaks/${uid}`)
+                streak_ref.once('value')
+                    .then((data) => {
+                        res.status(200).send(data);
+                    }).catch((error) => {
+                        console.log(error);
+                        res.status(500).send("No streak data to retrieve");
+                });
+            }).catch((error) => {
+            console.log(error);
+            res.status(400).send("Invalid token");
+        });
+    } else {
+        res.status(400).send("No user token was sent");
+    }
+});
+
+app.post('/streak', (req, res) => {
+    // Firebase user credential
+    const user_in = req.header('user');
+    const streak_data = req.header('streak-data') ? JSON.parse(req.header('streak-data')) : null;
+
+    if (!streak_data) {
+        res.status(400).send("No streak data sent");
+    }
+
+    // Make sure the user credentials were passed
+    if (user_in) {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const streak_ref = db.ref(`streaks/${uid}`)
+                streak_ref.set(streak_data)
+                    .then((message) => {
+                        console.log(message);
+                        res.status(201).send("Success");
+                    }).catch((error) => {
+                    console.log(error);
+                    res.status(500).send("Error saving data");
+                });
+            }).catch((error) => {
+                console.log(error);
+                res.status(400).send("Invalid token");
+        });
+    } else {
+        res.status(400).send("No user token was sent");
     }
 });
 

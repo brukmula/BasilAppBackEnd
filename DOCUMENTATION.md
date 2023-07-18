@@ -191,6 +191,58 @@ If the update was successful, the following will be returned
 "Invalid token"
 ```
 
+### Streaks
+Method: GET, POST
+#### /streak [GET]
+For the get method, data for the streak is retrieved. This requires the `user` header parameter to be the JWT from before
+#### Returns
+Streak data ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+##### Example data (can change):
+```json
+{
+    "count": 7, 
+    "goal": 15, 
+    "last-increment": 1689700721,
+    "period" :"month"
+}
+```
+No data to retrieve ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"No streak data to retrieve"
+```
+No token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Invalid token"
+```
+
+#### /streak [POST]
+For the post method, data for the streak will be set. This requires the `user` header parameter to be the JWT from before and `streak-data` to be the data to be stored.
+#### Returns 
+Successful storage ([201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201))
+```js
+"Success"
+```
+Error in saving data (could be firebase itself or configuration issues) ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error saving data"
+```
+No streak data sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No streak data sent"
+```
+No token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Invalid token"
+```
+
 ## Internal
 ### Health check
 Method: GET
