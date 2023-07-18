@@ -5,15 +5,14 @@ const bodyParser = require('body-parser');
 const firebase = require('firebase');
 const admin = require("firebase-admin");
 const helmet = require('helmet');
-const {applicationDefault} = require("firebase-admin/app");
+const { applicationDefault } = require("firebase-admin/app");
 
+// Firebase setup
 const firebaseApp = admin.initializeApp({
     credential: applicationDefault(),
     databaseURL: 'https://basil-backend-47d01-default-rtdb.firebaseio.com/'
 });
-
-const app = express();
-
+const db = admin.database();
 const firebaseConfig = {
   apiKey: "AIzaSyBd0Y7I4YMf4hW7UQm8bu-eJPGeF35oEns",
   authDomain: "basil-backend-47d01.firebaseapp.com",
@@ -23,13 +22,17 @@ const firebaseConfig = {
   appId: "1:300649571476:web:ba0270dd36fa594b6e8081",
   measurementId: "G-0TWY109F6B"
 };
-
 firebase.initializeApp(firebaseConfig);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
-app.use(cors());
-app.use(compression());
 
+// Express setup
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));     // Parse requests
+app.use(helmet());  // For security policy
+app.use(cors());    // For Cross-Origin Resource Sharing
+app.use(compression());     // For bandwidth saving on the more intensive actions
+
+// Security policy for user logins
 app.use(
     helmet.contentSecurityPolicy({
       directives: {
@@ -47,18 +50,17 @@ app.post('/signup', (req, res) => {
 
     // TODO: Add more email filtering (regex/firebase) and more informative response
     if (email.length < 8 || password.length < 8) {
-        res.send("Invalid email or password length")
+        res.status(400).send("Invalid email or password length")
     }
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
           // User created successfully
           const user = userCredential.user;
-          // sessions.push({'user': user.uid, 'session': user});
           console.log(`Successfully signed up ${user.email}`);
           user.getIdToken(/* forceRefresh */ true)
               .then((token) => {
-                  res.status(200).send(token);
+                  res.status(201).send(token);
               }).catch((error) => {
                 res.status(500).send(error);
               })
@@ -80,7 +82,6 @@ app.post('/signin', (req, res) => {
         .then((userCredential) => {
             // User signed in successfully
             const user = userCredential.user;
-            // sessions.push({'user': user.uid, 'session': user});
             console.log(`Successfully signed in ${user.email}`);
             user.getIdToken(/* forceRefresh */ true)
                 .then((token) => {
@@ -105,30 +106,39 @@ app.post('/update-profile', (req, res) => {
     const userName = req.header('displayName')
     const profilePicture = req.header('photoURL')
 
+    // No valid data sent, so immediately throw an error
     if (!userName && ! profilePicture && !user_in) {
         res.status(400).send("No valid data was sent")
     }
+    // If there is a token, proceed
     if (user_in) {
-        let newData = {}
+        let newData = {}    // JS Object for the new data
+        // Assign new data as given
         if (userName) {
             newData['displayName'] = userName;
         }
         if (profilePicture) {
             newData['photoURL'] = profilePicture;
         }
+        // Verify the token
         firebaseApp.auth().verifyIdToken(user_in)
             .then((token) => {
+                // Update the user data
                 const uid = token.uid;
                 return firebaseApp.auth().updateUser(uid, newData);
             })
             .then((record) => {
+                // Log (for now) the updated record in the console and return success
                 console.log(record.toJSON());
                 res.status(200).send("Success");
             })
             .catch((error) => {
-                res.status(500).send(error);
+                // Invalid token sent. Perhaps it is invalid or a bad token.
+                console.log(error);
+                res.status(403).send("Invalid token");
         });
     } else {
+        // No token was sent in the request.
         res.status(401).send("No user authorization was sent");
     }
 });
