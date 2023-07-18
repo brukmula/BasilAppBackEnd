@@ -19,4 +19,4 @@ EXPOSE 3000
 # EXPOSE 3001
 
 CMD [ "node", "app.js" ]
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD wget http://localhost:5000/health -q -O - > /dev/null 2>&1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD wget http://localhost:3000/health -q -O - > /dev/null 2>&1
