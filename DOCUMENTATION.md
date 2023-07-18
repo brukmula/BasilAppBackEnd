@@ -190,3 +190,12 @@ If the update was successful, the following will be returned
 ```js
 "Invalid token"
 ```
+
+## Internal
+### Health check
+Method: GET
+#### /health
+If the container is healthy, the following is returned
+```js
+"Healthy: OK"
+```
