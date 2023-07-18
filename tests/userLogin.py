@@ -1,6 +1,7 @@
 import requests
+import json
 
-uri = "http://127.0.0.1:3001/signin"
+uri = "http://127.0.0.1:3000/signin"
 
 if __name__ == '__main__':
     headers: dict = {
@@ -8,4 +9,4 @@ if __name__ == '__main__':
         'password': 'password'
     }
     response = requests.post(uri, headers=headers)
-    print(response.text)
+    print(json.dumps(response.json(), indent=4))
