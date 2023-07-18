@@ -4,22 +4,14 @@ const compression = require('compression')
 const express = require('express');
 const helmet = require('helmet');
 
+// Bible(s)
 const NET = require("../bibles/net");
 const net_bible_obj = new NET();
 // const morgan = require('morgan');
 
+// Used for API routes
 const app = express.Router();
-const port = process.env.PORT || 3000;
 
-async function net_bible_old(book, chapter) {
-  try {
-    const response = await fetch(`https://labs.bible.org/api/?passage=${book}%20${chapter}&type=json`);
-    return await response.json();
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
 
 // adding Helmet the APIs security
 app.use(helmet());
@@ -30,12 +22,13 @@ app.use(bodyParser.json());
 // enabling CORS for all requests
 app.use(cors());
 
-// Use compression to ease network burden
+// Use compression to ease network burden (~37% in my testing with little overhead)
 app.use(compression());
 
 // TODO: Use later // adding morgan to log HTTP requests
 // app.use(morgan('combined'));
 
+// Bible endpoint. Used for passage retrieval. Example request:
 // http://127.0.0.1:3000/api/bible/?book=John&chapter=3
 app.get('/bible', (req, res) => {
   console.log(req.query);
@@ -45,10 +38,5 @@ app.get('/bible', (req, res) => {
   console.log(chapter);
   net_bible_obj.get_passage(book, chapter).then( (data) => res.send(data) );
 });
-
-// starting the server
-/* app.listen(port, () => {
-  console.log(`API server listening on port ${port}`);
-}); */
 
 module.exports = app;
