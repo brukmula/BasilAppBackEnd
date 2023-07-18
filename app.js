@@ -32,6 +32,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', bibleRouter);
 app.use('/', usersRouter);
 
+app.get('/health', (req, res) => {
+  res.status(200).send("Healthy: OK");
+})
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
