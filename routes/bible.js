@@ -36,7 +36,12 @@ app.get('/bible', (req, res) => {
   console.log(book);
   let chapter = req.query.chapter;
   console.log(chapter);
-  net_bible_obj.get_passage(book, chapter).then( (data) => res.send(data) );
+  net_bible_obj.get_passage(book, chapter)
+      .then((data) => {
+        res.status(200).send(data)
+      }).catch((error) => {
+        res.status(400).send(error);
+  });
 });
 
 module.exports = app;

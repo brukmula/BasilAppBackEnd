@@ -24,7 +24,7 @@ class NET {
     async get_passage(book, chapter) {
         const remove_bold_tag = /<.*?>/g;
         if (!this.is_valid(book, chapter)) {
-            return {'error': `invalid passage ${book} ${chapter}`};
+            throw new Error(`invalid passage ${book} ${chapter}`);
         }
         if (book in this.cache) {
             if (chapter in this.cache[book]){

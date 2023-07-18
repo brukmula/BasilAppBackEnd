@@ -133,10 +133,10 @@ Name of the book of the Bible to get
 ```
 </details>
 
-#### Bad requests
+#### Bad requests ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
 Bad requests will return the following data:
-```json
-{"error": "invalid passage ${book} ${chapter}"}
+```js
+`invalid passage ${book} ${chapter}`
 ```
 
 ## User endpoint
