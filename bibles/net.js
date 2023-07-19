@@ -16,6 +16,10 @@ class NET {
         this.cache = {}
     };
 
+    valid_passages() {
+      return this.valid_pass;
+    };
+
     is_valid(book, chapter) {
         return book in this.valid_pass && this.valid_pass[book] >= chapter;
     };

@@ -25,7 +25,7 @@ docker build -t basil-backend .
 
 ##### Run the container (detached)
 ```shell
-docker run -d -p 3000:3000 -p 3001:3001 \
+docker run -d -p 3000:3000 \
        --restart=unless-stopped \
        --name basil-backend \
        basil-backend
