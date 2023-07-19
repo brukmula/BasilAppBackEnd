@@ -1,16 +1,18 @@
 # BasilAppBackEnd Documentation
 All endpoints currently start from the base uri: https://basil-backend-feutdwkkwq-uc.a.run.app/
-### Bible Endpoint
+## Bible Endpoint
+### Passage retrieval
 #### /api/bible/
 Method: GET
 #### Parameters:
 - **book**:
 Name of the book of the Bible to get
 - **chapter**: chapter number in the book to get
-- **version**: (not implemented) version to get the passage from
+- **version**: (pseudo implemented) version to get the passage from
 
 #### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200)):
-**example return of John 3, NET using query https://basil-backend-feutdwkkwq-uc.a.run.app/api/bible/?book=John&chapter=3&version=NET**
+**example return of John 3, NET using query 
+https://basil-backend-feutdwkkwq-uc.a.run.app/api/bible/?book=John&chapter=3&version=NET**
 
 <details>
     <summary>Response</summary>
@@ -139,6 +141,105 @@ Bad requests will return the following data:
 `invalid passage ${book} ${chapter}`
 ```
 
+### Version Info
+Method: GET
+#### /api/version-info
+This endpoint requires the query parameter `version` to be the abbreviation for that version. For example, the New 
+English Translation's abbreviation is `NET`. 
+<details>
+    <summary>Extra reading</summary>
+
+The reason for this endpoint is that not all versions will have the same 
+number of books or chapters in those books. For example, the WEB (World English Bible) contains Psalm 151, which is 
+recognized as Deuterocanonical Scripture by the Greek Orthodox and Russian Orthodox Churches. There is, of course, also 
+the apocrypha. That's a whole 14 books that some versions also have. They are mostly Catholic Bibles, but also includes 
+the 1611 KJV. [This Wikipedia article has a list of notable versions that include it](https://en.wikipedia.org/wiki/Biblical_apocrypha#:~:text=To%20this%20date%2C%20the%20Apocrypha,and%20Sarah%20in%20the%20Apocrypha%22.)
+</details>
+
+#### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+<details>
+    <summary>Example response</summary>
+
+Each book name is used as a key, with the value corresponding to the number of chapters in that book for the given version.<br>
+The following is an example using the NET with the following query: http://<base-uri>/api/version-info/?version=NET
+```json
+{
+    "Genesis": 50,
+    "Exodus": 40,
+    "Leviticus": 27,
+    "Numbers": 36,
+    "Deuteronomy": 34,
+    "Joshua": 24,
+    "Judges": 21,
+    "Ruth": 4,
+    "1 Samuel": 31,
+    "2 Samuel": 24,
+    "1 Kings": 22,
+    "2 Kings": 25,
+    "1 Chronicles": 29,
+    "2 Chronicles": 36,
+    "Ezra": 10,
+    "Nehemiah": 13,
+    "Esther": 10,
+    "Job": 42,
+    "Psalms": 150,
+    "Proverbs": 31,
+    "Ecclesiastes": 12,
+    "Song of Solomon": 8,
+    "Isaiah": 66,
+    "Jeremiah": 52,
+    "Lamentations": 5,
+    "Ezekiel": 48,
+    "Daniel": 12,
+    "Hosea": 14,
+    "Joel": 3,
+    "Amos": 9,
+    "Obadiah": 1,
+    "Jonah": 4,
+    "Micah": 7,
+    "Nahum": 3,
+    "Habakkuk": 3,
+    "Zephaniah": 3,
+    "Haggai": 2,
+    "Zechariah": 14,
+    "Malachi": 4,
+    "Matthew": 28,
+    "Mark": 16,
+    "Luke": 24,
+    "John": 21,
+    "Acts": 28,
+    "Romans": 16,
+    "1 Corinthians": 16,
+    "2 Corinthians": 13,
+    "Galatians": 6,
+    "Ephesians": 6,
+    "Philippians": 4,
+    "Colossians": 4,
+    "1 Thessalonians": 5,
+    "2 Thessalonians": 3,
+    "1 Timothy": 6,
+    "2 Timothy": 4,
+    "Titus": 3,
+    "Philemon": 1,
+    "Hebrews": 13,
+    "James": 5,
+    "1 Peter": 5,
+    "2 Peter": 3,
+    "1 John": 5,
+    "2 John": 1,
+    "3 John": 1,
+    "Jude": 1,
+    "Revelation": 22
+}
+```
+</details>
+
+#### Bad requests ([404](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404))
+If the query does not match a supported version, the following will be returned
+```js
+"No version information available"
+```
+
 ## User endpoint
 ### Signup
 Method: POST
@@ -147,11 +248,13 @@ This endpoint requires the headers `email` and `password` for the *new* user to 
 #### Returns ([201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201)):
 JSON Web Token (JWT) of the new user. This is used for further actions.
 #### Bad requests:
-For user creation errors, the following will be returned (code [400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+For user creation errors, the following will be returned 
+(code [400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
 ```js
 "Error creating user: ${error.message}"
 ```
-For generic firebase issues, the following will be returned (code [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+For generic firebase issues, the following will be returned 
+(code [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
 ```js
 error // Some raw string of the error
 ```
@@ -163,7 +266,8 @@ This endpoint requires the headers `email` and `password` for the *existing* use
 #### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
 JSON Web Token (JWT) of the existing user. This is used for further actions.
 #### Bad requests:
-For firebase and sign in (will change later) issues, the following will be returned (code [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+For firebase and sign in (will change later) issues, the following will be returned 
+(code [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
 ```js
 error // Some raw string of the error
 ```
@@ -201,7 +305,8 @@ This endpoint requires the header `user` to be either the uid of the user to ret
 ### Update-profile
 Method: POST
 #### /update-profile
-This endpoint requires the header `user` to be the JWT from before and one or both of the headers `displayName` and `photoURL` to be included.
+This endpoint requires the header `user` to be the JWT from before and one or both of the headers `displayName` and 
+`photoURL` to be included.
 #### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
 If the update was successful, the following will be returned
 ```js
@@ -250,7 +355,8 @@ Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Stat
 ```
 
 #### /streak [POST]
-For the post method, data for the streak will be set. This requires the `user` header parameter to be the JWT from before and `streak-data` to be the data to be stored.
+For the post method, data for the streak will be set. This requires the `user` header parameter to be the JWT from 
+before and `streak-data` to be the data to be stored.
 #### Returns 
 Successful storage ([201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201))
 ```js
