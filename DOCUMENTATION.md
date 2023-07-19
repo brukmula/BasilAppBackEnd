@@ -168,6 +168,32 @@ For firebase and sign in (will change later) issues, the following will be retur
 error // Some raw string of the error
 ```
 
+### Get-profile
+Method: GET
+#### /profile
+This endpoint requires the header `user` to be either the uid of the user to retrieve or the JWT from before.
+#### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+```json
+{"displayName":"Example User","uid":"5sjSwq6KClSb12a5Rp56xJrh44C3"}
+```
+#### Bad requests
+- Invalid/bad UID ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error finding UID"
+```
+- Invalid/bad token ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Invalid token"
+```
+- Issues finding the user's profile from JWT ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error finding user"
+```
+- No token or uid sent ([401](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401))
+```js
+"No user information was sent"
+```
+
 ### Update-profile
 Method: POST
 #### /update-profile

@@ -44,7 +44,6 @@ app.use(
 
 // get user data for auth
 app.post('/signup', (req, res) => {
-    console.log(req.get('Content-Type'));
     const email = req.header('email');
     const password = req.header('password');
 
@@ -73,7 +72,6 @@ app.post('/signup', (req, res) => {
 
 // get user data to create an account
 app.post('/signin', (req, res) => {
-    console.log(req.get('Content-Type')); // Just to see what we are getting
     const email = req.header('email');
     const password = req.header('password');
 
@@ -198,6 +196,47 @@ app.post('/streak', (req, res) => {
         });
     } else {
         res.status(400).send("No user token was sent");
+    }
+});
+
+app.get('/profile', (req, res) => {
+    const user_in = req.header('user');
+
+    if (user_in.length < 35) {
+        firebaseApp.auth().getUser(user_in)
+            .then((user) => {
+                let data = {};
+                data['displayName'] = user.displayName;
+                data['uid'] = user.uid;
+                data['photoURL'] = user.photoURL;
+                res.status(200).send(data);
+            }).catch((error) => {
+                console.log(error);
+                res.status(500).send("Error finding UID");
+        });
+    }
+    else if (user_in) {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                firebaseApp.auth().getUser(uid)
+                    .then((user) => {
+                        let data = {};
+                        data['displayName'] = user.displayName;
+                        data['uid'] = user.uid;
+                        data['photoURL'] = user.photoURL;
+                        res.status(200).send(data);
+                    }).catch((error) => {
+                        console.log(error);
+                        res.status(500).send("Error finding user");
+                });
+            }).catch((error) => {
+                console.log(error);
+                res.status(500).send("Invalid token");
+        });
+    }
+    else {
+        res.status(400).send("No user information was sent");
     }
 });
 
