@@ -7,6 +7,7 @@ const helmet = require('helmet');
 // Bible(s)
 const NET = require("../bibles/net");
 const net_bible_obj = new NET();
+const version_list = ['NET'];
 // const morgan = require('morgan');
 
 // Used for API routes
@@ -60,7 +61,7 @@ app.get('/version-info', (req, res) => {
 });
 
 app.get('/versions', (req, res) => {
-    const versions = {'versions': ['NET']}
+    const versions = {'versions': version_list}
     res.status(200).send(versions);
 });
 
