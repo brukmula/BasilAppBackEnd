@@ -7,6 +7,7 @@ const helmet = require('helmet');
 // Bible(s)
 const NET = require("../bibles/net");
 const net_bible_obj = new NET();
+const version_list = ['NET'];
 // const morgan = require('morgan');
 
 // Used for API routes
@@ -48,6 +49,26 @@ app.get('/bible', (req, res) => {
   }
 });
 
+app.get('/search', (req, res) => {
+    const version = req.query['version'];
+    const query = req.query['query'];
+    if (query.length === 0) {
+        res.status(400).send("Please include a query to search for");
+    }
+    else if (version === 'NET') {
+        net_bible_obj.search(query)
+            .then((result) => {
+                res.status(200).send(result);
+            }).catch((error) => {
+                console.log(error);
+                res.status(500).send(error);
+        });
+    }
+    else {
+        res.status(404).send("Please specify the version");
+    }
+});
+
 // Get information on valid passages for each version
 app.get('/version-info', (req, res) => {
     const version = req.query['version']
@@ -57,6 +78,11 @@ app.get('/version-info', (req, res) => {
     else {
         res.status(404).send("No version information available");
     }
+});
+
+app.get('/versions', (req, res) => {
+    const versions = {'versions': version_list}
+    res.status(200).send(versions);
 });
 
 module.exports = app;
