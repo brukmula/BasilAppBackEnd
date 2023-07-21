@@ -148,7 +148,7 @@ This endpoint requires the query parameters `version` to be the abbreviation for
 the requested search of the Bible. Fair warning, this is a bit slow.
 #### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
 <details>
-    <summary>Example response</summary>
+    <summary>Example response (warning: large)</summary>
 
 ```json
 [
