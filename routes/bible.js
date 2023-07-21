@@ -7,6 +7,7 @@ const helmet = require('helmet');
 // Bible(s)
 const NET = require("../bibles/net");
 const net_bible_obj = new NET();
+const search_cache = {'NET': []};
 const version_list = ['NET'];
 // const morgan = require('morgan');
 
@@ -49,20 +50,51 @@ app.get('/bible', (req, res) => {
   }
 });
 
+/* Search route
+* Examples:
+* http://127.0.0.1:3000/api/search/?version=NET&query=Jesus%20wept
+* http://127.0.0.1:3000/api/search/?version=NET&query=Jesus%20wept&page=1
+* http://127.0.0.1:3000/api/search/?version=NET&query=Jesus%20wept&page=2
+* http://127.0.0.1:3000/api/search/?version=NET&query=Jesus%20wept&pageSize=2
+*/
 app.get('/search', (req, res) => {
     const version = req.query['version'];
     const query = req.query['query'];
+    const page = req.query['page'] ? req.query['page'] : 1;
+    const page_size = req.query['pageSize'] ? req.query['pageSize'] : 20;
+
     if (query.length === 0) {
         res.status(400).send("Please include a query to search for");
     }
     else if (version === 'NET') {
-        net_bible_obj.search(query)
-            .then((result) => {
-                res.status(200).send(result);
-            }).catch((error) => {
-                console.log(error);
-                res.status(500).send(error);
-        });
+        if (search_cache['NET'] && query in search_cache['NET']) {
+            const results = search_cache['NET'][query].slice(page * page_size - page_size, page * page_size);
+
+            res.status(200).send(
+                {'page': page,
+                'pageCount': Math.ceil(search_cache['NET'][query].length / page_size),
+                'content': results});
+        }
+        else {
+            net_bible_obj.search(query)
+                .then((result) => {
+                    // Keep the cache size reasonable
+                    if (search_cache['NET'].length >= 10) {
+                        search_cache['NET'].shift();
+                    }
+
+                    search_cache['NET'][query] = result;
+                    const results = result.slice(page * page_size - page_size, page * page_size);
+
+                    res.status(200).send(
+                        {'page': page,
+                            'pageCount': Math.ceil(search_cache['NET'][query].length / page_size),
+                            'content': results});
+                }).catch((error) => {
+                    console.log(error);
+                    res.status(500).send(error);
+            });
+        }
     }
     else {
         res.status(404).send("Please specify the version");
