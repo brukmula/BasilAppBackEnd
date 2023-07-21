@@ -59,4 +59,9 @@ app.get('/version-info', (req, res) => {
     }
 });
 
+app.get('/versions', (req, res) => {
+    const versions = {'versions': ['NET']}
+    res.status(200).send(versions);
+});
+
 module.exports = app;
