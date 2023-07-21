@@ -160,10 +160,12 @@ the 1611 KJV. [This Wikipedia article has a list of notable versions that includ
 <details>
     <summary>Example response</summary>
 
-Each book name is used as a key, with the value corresponding to the number of chapters in that book for the given version.<br>
+Each book name is used as a key, with the value corresponding to the number of chapters in that book for the given 
+version split into old and new testament.<br>
 The following is an example using the NET with the following query: http://<base-uri>/api/version-info/?version=NET
 ```json
 {
+  "OT": {
     "Genesis": 50,
     "Exodus": 40,
     "Leviticus": 27,
@@ -202,7 +204,9 @@ The following is an example using the NET with the following query: http://<base
     "Zephaniah": 3,
     "Haggai": 2,
     "Zechariah": 14,
-    "Malachi": 4,
+    "Malachi": 4
+  },
+  "NT": {
     "Matthew": 28,
     "Mark": 16,
     "Luke": 24,
@@ -230,6 +234,7 @@ The following is an example using the NET with the following query: http://<base
     "3 John": 1,
     "Jude": 1,
     "Revelation": 22
+  }
 }
 ```
 </details>
@@ -238,6 +243,19 @@ The following is an example using the NET with the following query: http://<base
 If the query does not match a supported version, the following will be returned
 ```js
 "No version information available"
+```
+
+### Versions
+Method: GET
+#### /api/versions
+Returns a list of all currently supported versions.
+Example:
+```json
+{
+"versions": [
+    "NET"
+  ]
+}
 ```
 
 ## User endpoint
