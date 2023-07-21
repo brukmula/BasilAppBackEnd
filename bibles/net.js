@@ -25,21 +25,44 @@ class NET {
                 '1 Thessalonians': 5, '2 Thessalonians': 3, '1 Timothy': 6, '2 Timothy': 4, 'Titus': 3, 'Philemon': 1,
                 'Hebrews': 13, 'James': 5, '1 Peter': 5, '2 Peter': 3, '1 John': 5, '2 John': 1, '3 John': 1, 'Jude': 1,
                 'Revelation': 22}
-        }
-        this.book_index = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation'];
+        };
+        this.book_index = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth',
+            '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther',
+            'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
+            'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah',
+            'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians',
+            '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians',
+            '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter',
+            '1 John', '2 John', '3 John', 'Jude', 'Revelation'];
         this.cache = {}
     };
 
     valid_passages() {
-      return this.sections;
+        /**
+         * Returns a list of valid passages, split into the old and new testaments
+         * @returns {Object} book names and associated chapter counts
+         */
+        return this.sections;
     };
 
     is_valid(book, chapter) {
+        /**
+         * Cheap check for valid Bible references
+         * @param book: name to check for the validity of
+         * @param chapter: chapter to check within the aforementioned book
+         * @returns {boolean} valid or not
+         */
         return book in this.valid_pass && this.valid_pass[book] >= chapter;
     };
 
 
     async get_passage(book, chapter) {
+        /**
+         * Get a specified Bible passage
+         * @param book {string}: Reference by name of the book of the Bible to get
+         * @param chapter {string|number}: Reference to the number of the chapter of the aforementioned book to get
+         * @returns {object} bible passage
+         */
         const remove_bold_tag = /<.*?>/g;
         if (!this.is_valid(book, chapter)) {
             throw new Error(`invalid passage ${book} ${chapter}`);
@@ -70,10 +93,37 @@ class NET {
     };
 
     async search(query) {
+        /**
+         * Search for a Bible passage
+         * @param query {string}: query to search for
+         * @returns {Array[Object]}
+         */
         try {
-            const response = await fetch(`https://bolls.life/search/NET/?search=${query}`);
+            const response = await fetch(`https://bolls.life/search/NET/?search=${query}`)
+                .then((raw_response) => {
+                    return raw_response.json();
+                });
+            let data = [];
+            response.forEach(verse_ref => {
+                let item = {};
+                /*  Go from numbered books to named books, since this API gives us numbers and I'd like to give the
+                    frontend names of the books. This is partially for less API calls, but more so overall convenience.
+                */
+                item['book'] = this.book_index[verse_ref['book'] - 1];
+
+                // Chapter reference
+                item['chapter'] = verse_ref['chapter'];
+
+                // Verse reference
+                item['verse'] = verse_ref['verse'];
+
+                // Text returned including <mark> tags for the matching text
+                item['text'] = verse_ref['text'];
+                data.push(item);
+            });
+            return data;
         } catch (error) {
-            return `Error: ${error.message}`;
+            throw new Error(`Error: ${error.message}`);
         }
     }
 }

@@ -49,6 +49,26 @@ app.get('/bible', (req, res) => {
   }
 });
 
+app.get('/search', (req, res) => {
+    const version = req.query['version'];
+    const query = req.query['query'];
+    if (query.length === 0) {
+        res.status(400).send("Please include a query to search for");
+    }
+    else if (version === 'NET') {
+        net_bible_obj.search(query)
+            .then((result) => {
+                res.status(200).send(result);
+            }).catch((error) => {
+                console.log(error);
+                res.status(500).send(error);
+        });
+    }
+    else {
+        res.status(404).send("Please specify the version");
+    }
+});
+
 // Get information on valid passages for each version
 app.get('/version-info', (req, res) => {
     const version = req.query['version']
