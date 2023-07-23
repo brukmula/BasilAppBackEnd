@@ -153,7 +153,7 @@ Fair warning, this is a bit slow.
 
 ```json
 {
-    "page": "1",
+    "page": 1,
     "pageCount": 52,
     "content": [
         {

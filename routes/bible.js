@@ -87,7 +87,7 @@ app.get('/search', (req, res) => {
                     const results = result.slice(page * page_size - page_size, page * page_size);
 
                     res.status(200).send(
-                        {'page': page,
+                        {'page': Number(page),
                             'pageCount': Math.ceil(search_cache['NET'][query].length / page_size),
                             'content': results});
                 }).catch((error) => {
