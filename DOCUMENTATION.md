@@ -542,6 +542,65 @@ Example:
 ```
 
 ## User endpoint
+### Roots
+Method: GET, POST
+#### /roots [GET]
+For the get method, data for the roots streak is retrieved. This requires the `user` header parameter to be the JWT from 
+before
+#### Returns
+Roots data ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+##### Example data (can change):
+```json
+{
+  "days": 7,
+  "lastIncrement": 1689700721,
+  "startDate": 1689700721
+}
+```
+No data to retrieve ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"No roots data to retrieve"
+```
+No token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Invalid token"
+```
+
+#### /streak [POST]
+For the post method, data for the streak will be set. This requires the `user` header parameter to be the JWT from
+before and `roots-data` to be the data to be stored. This data should JSOn with the following keys: `startDate` (the 
+start date of the streak), `lastIncrement` (the last increment of the streak), `days` (the number of days in the streak)
+#### Returns
+Successful storage ([201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201))
+```js
+"Success"
+```
+Error in saving data (could be firebase itself or configuration issues) 
+([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error saving data"
+```
+No roots streak data sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No roots streak data sent"
+```
+Invalid roots streak data sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Invalid roots streak data sent"
+```
+No token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Invalid token"
+```
+
 ### Signup
 Method: POST
 #### /signup
