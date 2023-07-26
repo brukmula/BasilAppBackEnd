@@ -199,6 +199,73 @@ app.post('/streak', (req, res) => {
     }
 });
 
+app.get('/roots', (req, res) => {
+    // Firebase user credential
+    const user_in = req.header('user');
+
+    // Make sure the user credentials were passed
+    if (user_in) {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const streak_ref = db.ref(`roots/${uid}`)
+                streak_ref.once('value')
+                    .then((data) => {
+                        res.status(200).send(data);
+                    }).catch((error) => {
+                    console.log(error);
+                    res.status(500).send("No roots data to retrieve");
+                });
+            }).catch((error) => {
+            console.log(error);
+            res.status(400).send("Invalid token");
+        });
+    } else {
+        res.status(400).send("No user token was sent");
+    }
+});
+
+app.post('/roots', (req, res) => {
+    // Firebase user credential
+    const user_in = req.header('user');
+    const streak_data = req.header('roots-data') ? JSON.parse(req.header('roots-data')) : null;
+    const roots_data = {};
+
+    if (!streak_data) {
+        res.status(400).send("No roots streak data sent");
+    }
+    else if (!'startDate' in streak_data || !'lastIncrement' in streak_data || !'days' in streak_data ||
+        isNaN(streak_data['days']) || isNaN(parseInt(streak_data['days'])) || streak_data['days'] > 7) {
+        res.status(400).send("Invalid roots streak data sent");
+    }
+
+    // Make sure the user credentials were passed
+    else if (user_in) {
+        roots_data['startDate'] = streak_data['startDate'];
+        roots_data['lastIncrement'] = streak_data['lastIncrement'];
+        roots_data['days'] = streak_data['days'];
+
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const roots_ref = db.ref(`roots/${uid}`)
+                roots_ref.set(roots_data)
+                    .then((message) => {
+                        console.log(message);
+                        res.status(201).send("Success");
+                    }).catch((error) => {
+                        console.log(error);
+                        res.status(500).send("Error saving data");
+                });
+            }).catch((error) => {
+            console.log(error);
+            res.status(400).send("Invalid token");
+        });
+    } else {
+        res.status(400).send("No user token was sent");
+    }
+});
+
 app.get('/profile', (req, res) => {
     const user_in = req.header('user');
 
