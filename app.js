@@ -1,4 +1,7 @@
 // Modules
+const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const express = require('express');
@@ -9,10 +12,14 @@ const path = require('path');
 const bibleRouter = require('./routes/bible');
 // const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+// const socialRouter = require('./routes/social');
 
 // App
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(helmet());  // For security policy
+app.use(cors());    // For Cross-Origin Resource Sharing
+app.use(compression());     // For bandwidth saving on the more intensive actions
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
