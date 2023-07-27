@@ -9,4 +9,4 @@ if __name__ == '__main__':
         'password': 'password'
     }
     response = requests.post(uri, headers=headers)
-    print(json.dumps(response.json(), indent=4))
+    print(response.text)
