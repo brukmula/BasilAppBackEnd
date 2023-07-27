@@ -1,10 +1,7 @@
-const cors = require('cors');
-const compression = require('compression')
 const express = require('express');
 const bodyParser = require('body-parser');
 const firebase = require('firebase');
 const admin = require("firebase-admin");
-const helmet = require('helmet');
 const { applicationDefault } = require("firebase-admin/app");
 const { firebaseConfig } = require('./firebaseConf');
 
@@ -20,19 +17,6 @@ firebase.initializeApp(firebaseConfig);
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));     // Parse requests
-app.use(helmet());  // For security policy
-app.use(cors());    // For Cross-Origin Resource Sharing
-app.use(compression());     // For bandwidth saving on the more intensive actions
-
-// Security policy for user logins
-app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": ["'unsafe-inline'", "https://www.gstatic.com"],
-      },
-    })
-);
 
 // get user data for auth
 app.post('/signup', (req, res) => {
