@@ -54,7 +54,16 @@ app.post('/signup', (req, res) => {
                   res.status(201).send(token);
               }).catch((error) => {
                 res.status(500).send(error);
-              })
+              });
+
+          // After user creation, make their friends list. Do this after sending the token for speed.
+          const friends_ref = db.ref(`friends/${user.uid}`)
+          friends_ref.set("")
+              .then((message) => {
+                  console.log(message);
+              }).catch((error) => {
+                console.log(error);
+          });
       })
       .catch((error) => {
         // Error creating user
@@ -278,12 +287,17 @@ app.get('/profile', (req, res) => {
         firebaseApp.auth().verifyIdToken(user_in)
             .then((token) => {
                 const uid = token.uid;
+                const friends_ref = db.ref(`friends/${uid}`)
                 firebaseApp.auth().getUser(uid)
                     .then((user) => {
                         let data = {};
                         data['displayName'] = user.displayName;
                         data['uid'] = user.uid;
                         data['photoURL'] = user.photoURL;
+                        data['friends'] = friends_ref.once('value')
+                            .then((friend_list) => {
+                                return friend_list;
+                            })
                         res.status(200).send(data);
                     }).catch((error) => {
                         console.log(error);

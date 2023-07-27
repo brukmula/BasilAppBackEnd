@@ -637,11 +637,20 @@ Method: GET
 #### /profile
 This endpoint requires the header `user` to be either the uid of the user to retrieve or the JWT from before.
 #### Returns ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+Passing the UID:
 ```json
 {
   "displayName":"Example User", 
   "uid":"5sjSwq6KClSb12a5Rp56xJrh44C3", 
   "photoURL": "https://httpcats.com/204.jpg"
+}
+```
+Passing the JWT:
+```json
+{
+  "displayName": "Example User",
+  "uid":"5sjSwq6KClSb12a5Rp56xJrh44C3",
+  "friends":{}
 }
 ```
 #### Bad requests
