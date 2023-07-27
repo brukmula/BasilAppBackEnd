@@ -1,17 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const firebase = require('firebase');
-const admin = require("firebase-admin");
-const { applicationDefault } = require("firebase-admin/app");
-const { firebaseConfig } = require('./firebaseConf');
 
-// Firebase setup
-const firebaseApp = admin.initializeApp({
-    credential: applicationDefault(),
-    databaseURL: 'https://basil-backend-47d01-default-rtdb.firebaseio.com/'
-});
-const db = admin.database();
-firebase.initializeApp(firebaseConfig);
+// Firebase things
+let firebase = null;
+let firebaseApp = null;
+let db = null;
+
+function usersFirebaseInit(firebaseIn, firebaseAppIn, dbIn) {
+    firebase = firebaseIn;
+    firebaseApp = firebaseAppIn;
+    db = dbIn;
+}
+
 
 // Express setup
 const app = express();
@@ -297,4 +297,4 @@ app.get('/profile', (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = {usersRouter: app, usersFirebaseInit};

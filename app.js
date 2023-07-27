@@ -11,8 +11,24 @@ const path = require('path');
 // Routes
 const bibleRouter = require('./routes/bible');
 // const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-// const socialRouter = require('./routes/social');
+const { usersRouter, usersFirebaseInit } = require('./routes/users');
+const { socialRouter, socialFirebaseInit } = require('./routes/social');
+
+// Firebase imports
+const firebase = require('firebase');
+const admin = require("firebase-admin");
+const { applicationDefault } = require("firebase-admin/app");
+const { firebaseConfig } = require('./routes/firebaseConf');
+
+// Firebase setup
+const firebaseApp = admin.initializeApp({
+  credential: applicationDefault(),
+  databaseURL: 'https://basil-backend-47d01-default-rtdb.firebaseio.com/'
+});
+const db = admin.database();
+firebase.initializeApp(firebaseConfig);
+usersFirebaseInit(firebase, firebaseApp, db);
+socialFirebaseInit(firebase, firebaseApp, db);
 
 // App
 const app = express();
@@ -37,7 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes usage
 // app.use('/', indexRouter);
 app.use('/api', bibleRouter);
-app.use('/', usersRouter);
+app.use('/', usersRouter, socialRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).send("Healthy: OK");
