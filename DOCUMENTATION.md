@@ -645,12 +645,16 @@ Passing the UID:
   "photoURL": "https://httpcats.com/204.jpg"
 }
 ```
-Passing the JWT:
+Passing the JWT (includes friends/following list):
 ```json
 {
-  "displayName": "Example User",
-  "uid":"5sjSwq6KClSb12a5Rp56xJrh44C3",
-  "friends":{}
+  "displayName": "Example Display Name",
+  "uid": "5sjSwq6KClSb12a5Rp56xJrh44C3",
+  "friends": {
+    "-NaS3SRrRZbvLXdUBT4Z": {
+      "uid": "RfNd5qDTNdeOlqq59QnXmb7xSEF3"
+    }
+  }
 }
 ```
 #### Bad requests

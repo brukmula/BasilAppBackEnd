@@ -17,6 +17,7 @@ if __name__ == '__main__':
     }
     profile_jwt_response = requests.get(f"{uri}profile", headers=profile_jwt_headers)
     print(profile_jwt_response.text)
+    print(json.dumps(profile_jwt_response.json(), indent=4))
 
     uid = profile_jwt_response.json()['uid']
 
