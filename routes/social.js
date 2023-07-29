@@ -53,8 +53,8 @@ app.post('/add-friend', (req, res) => {
                                         .then(() => {
                                             res.status(201).send(`Successfully followed user ${user.uid}, ${user.displayName}`);
                                         }).catch((error) => {
-                                        console.log(error);
-                                        res.status(500).send("Error following user");
+                                            console.log(error);
+                                            res.status(500).send("Error following user");
                                     });
                                 }
                                 else {
@@ -62,10 +62,11 @@ app.post('/add-friend', (req, res) => {
                                 }
                             }).catch((error) => {
                                 console.log(error);
+                                res.status(500).send("Database error when attempting to following user");
                             });
                     }).catch((error) => {
                         console.log(error);
-                        res.status(500).send("Error finding user");
+                        res.status(404).send("Error finding user");
                 });
             }).catch((error) => {
                 console.log(error);
