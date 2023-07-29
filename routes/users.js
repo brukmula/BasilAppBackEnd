@@ -278,11 +278,11 @@ app.get('/profile', (req, res) => {
                         data['displayName'] = user.displayName;
                         data['uid'] = user.uid;
                         data['photoURL'] = user.photoURL;
-                        data['friends'] = friends_ref.once('value')
-                            .then((friend_list) => {
-                                return friend_list;
-                            })
-                        res.status(200).send(data);
+                        friends_ref.once('value').then(friends => {
+                            console.log(friends);
+                            data['friends'] = friends;
+                            res.status(200).send(data);
+                        });
                     }).catch((error) => {
                         console.log(error);
                         res.status(500).send("Error finding user");
@@ -297,4 +297,4 @@ app.get('/profile', (req, res) => {
     }
 });
 
-module.exports = {usersRouter: app, usersFirebaseInit};
+module.exports = { usersRouter: app, usersFirebaseInit };
