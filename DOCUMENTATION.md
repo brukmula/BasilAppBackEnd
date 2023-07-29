@@ -541,6 +541,85 @@ Example:
 }
 ```
 
+## Social endpoint
+### Follow/friend user
+Method: POST
+#### '/add-friend
+This endpoint requires the headers `user` to be the JWT from user authentication and `to-follow` to be the user id (UID)
+of the user to follow.
+#### Returns
+- Successful following of the user ([201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201))
+```js
+`Successfully followed user ${user.uid}, ${user.displayName}`   
+// Display name is not necessary, but there. It's not stored here since it can change and ∴ should be retrieved from 
+// the profile endpoint
+```
+- Server error with firebase or something else ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error following user"
+```
+- User has already been followed ([409](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409))
+```js
+"User already followed"
+```
+- Error finding the user's friend list in the database ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+// This is a backend issue if you get this
+"Database error when attempting to following user"
+```
+- Error finding the user to follow ([404](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404))
+```js
+"Error finding user"
+```
+- Invalid JWT ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Invalid token"
+```
+- No UID sent to follow ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user to follow"
+```
+- No JWT sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+
+### Unfollow/unfriend user
+Method: POST
+#### '/remove-friend
+This endpoint requires the headers `user` to be the JWT from user authentication and `to-unfollow` to be the user id 
+(UID) of the user to unfollow.
+#### Returns
+- Successful unfollow/unfriend ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+```js
+`Successfully unfollowed user ${user_to_unfollow}`
+```
+- Database error when removing user ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+// The code shouldn't get here
+"Error removing user."
+```
+- Could not find the user in the friends list to unfollow/unfriend ([404](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404))
+```js
+`Could not find user to unfollow (${user_to_unfollow})`
+```
+- Friends list is empty ([404](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404))
+```js
+"Friends list is, sadly, empty"
+```
+- Invalid JWT ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Invalid token"
+```
+- No UID sent to unfollow/unfriend ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user to unfollow"
+```
+- No JWT sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+
 ## User endpoint
 ### Roots
 Method: GET, POST
