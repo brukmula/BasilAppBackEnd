@@ -11,6 +11,7 @@ if __name__ == '__main__':
     response = requests.post(f"{uri}signin", headers=signin_headers)
     print(response.text)
 
+    # Friend/follow the other example user
     friendly_headers: dict = {
         'user': response.text,                          # JWT as a string
         'to-follow': 'RfNd5qDTNdeOlqq59QnXmb7xSEF3'     # User's uid to follow
@@ -19,8 +20,10 @@ if __name__ == '__main__':
     get_friendly = requests.post(f"{uri}add-friend", headers=friendly_headers)
     print(get_friendly.text)
 
+    # Pause to manually view the state of the database
     input("Press enter to continue...")
 
+    # Unfriend/unfollow the example user
     unfriendly_headers: dict = {
         'user': response.text,                         # JWT as a string
         'to-unfollow': 'RfNd5qDTNdeOlqq59QnXmb7xSEF3'  # User's uid to unfollow
