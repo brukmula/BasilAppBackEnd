@@ -12,9 +12,19 @@ if __name__ == '__main__':
     print(response.text)
 
     friendly_headers: dict = {
-        'user': response.text,
+        'user': response.text,                          # JWT as a string
         'to-follow': 'RfNd5qDTNdeOlqq59QnXmb7xSEF3'     # User's uid to follow
     }
 
     get_friendly = requests.post(f"{uri}add-friend", headers=friendly_headers)
     print(get_friendly.text)
+
+    input("Press enter to continue...")
+
+    unfriendly_headers: dict = {
+        'user': response.text,                         # JWT as a string
+        'to-unfollow': 'RfNd5qDTNdeOlqq59QnXmb7xSEF3'  # User's uid to unfollow
+    }
+
+    get_unfriendly = requests.post(f"{uri}remove-friend", headers=unfriendly_headers)
+    print(get_unfriendly.text)
