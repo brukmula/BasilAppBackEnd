@@ -10,6 +10,10 @@ function usersFirebaseInit(firebaseIn, firebaseAppIn, dbIn) {
     firebase = firebaseIn;
     firebaseApp = firebaseAppIn;
     db = dbIn;
+
+    if (!firebase || !firebaseApp || !db) {
+        throw new Error("Invalid initialization");
+    }
 }
 
 
