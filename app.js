@@ -1,4 +1,7 @@
 // Modules
+const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const express = require('express');
@@ -8,11 +11,31 @@ const path = require('path');
 // Routes
 const bibleRouter = require('./routes/bible');
 // const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const { usersRouter, usersFirebaseInit } = require('./routes/users');
+const { socialRouter, socialFirebaseInit } = require('./routes/social');
+
+// Firebase imports
+const firebase = require('firebase');
+const admin = require("firebase-admin");
+const { applicationDefault } = require("firebase-admin/app");
+const { firebaseConfig } = require('./routes/firebaseConf');
+
+// Firebase setup
+const firebaseApp = admin.initializeApp({
+  credential: applicationDefault(),
+  databaseURL: 'https://basil-backend-47d01-default-rtdb.firebaseio.com/'
+});
+const db = admin.database();
+firebase.initializeApp(firebaseConfig);
+usersFirebaseInit(firebase, firebaseApp, db);
+socialFirebaseInit(firebase, firebaseApp, db);
 
 // App
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(helmet());  // For security policy
+app.use(cors());    // For Cross-Origin Resource Sharing
+app.use(compression());     // For bandwidth saving on the more intensive actions
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,27 +53,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes usage
 // app.use('/', indexRouter);
 app.use('/api', bibleRouter);
-app.use('/', usersRouter);
+app.use('/', usersRouter, socialRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).send("Healthy: OK");
 })
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 app.listen(port, () => {
   console.log(`API server listening on port ${port}`);

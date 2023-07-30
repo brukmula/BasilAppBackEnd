@@ -12,7 +12,7 @@ if __name__ == '__main__':
     response = requests.post(f"{uri}signin", headers=signin_headers)
     print(response.text)
 
-    streak_data = {'count': 7, 'goal': 15, 'period': 'month', 'last-increment': 1689700721}
+    streak_data = {'count': 32850, 'last-increment': 1690467902288}
 
     streak_set_headers = {
         'user': response.text,

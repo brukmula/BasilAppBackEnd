@@ -1,46 +1,26 @@
-const cors = require('cors');
-const compression = require('compression')
 const express = require('express');
 const bodyParser = require('body-parser');
-const firebase = require('firebase');
-const admin = require("firebase-admin");
-const helmet = require('helmet');
-const { applicationDefault } = require("firebase-admin/app");
 
-// Firebase setup
-const firebaseApp = admin.initializeApp({
-    credential: applicationDefault(),
-    databaseURL: 'https://basil-backend-47d01-default-rtdb.firebaseio.com/'
-});
-const db = admin.database();
-const firebaseConfig = {
-  apiKey: "AIzaSyBd0Y7I4YMf4hW7UQm8bu-eJPGeF35oEns",
-  authDomain: "basil-backend-47d01.firebaseapp.com",
-  projectId: "basil-backend-47d01",
-  storageBucket: "basil-backend-47d01.appspot.com",
-  messagingSenderId: "300649571476",
-  appId: "1:300649571476:web:ba0270dd36fa594b6e8081",
-  measurementId: "G-0TWY109F6B"
-};
-firebase.initializeApp(firebaseConfig);
+// Firebase things
+let firebase = null;
+let firebaseApp = null;
+let db = null;
+
+function usersFirebaseInit(firebaseIn, firebaseAppIn, dbIn) {
+    firebase = firebaseIn;
+    firebaseApp = firebaseAppIn;
+    db = dbIn;
+
+    if (!firebase || !firebaseApp || !db) {
+        throw new Error("Invalid initialization");
+    }
+}
+
 
 // Express setup
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));     // Parse requests
-app.use(helmet());  // For security policy
-app.use(cors());    // For Cross-Origin Resource Sharing
-app.use(compression());     // For bandwidth saving on the more intensive actions
-
-// Security policy for user logins
-app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": ["'unsafe-inline'", "https://www.gstatic.com"],
-      },
-    })
-);
 
 // get user data for auth
 app.post('/signup', (req, res) => {
@@ -62,7 +42,16 @@ app.post('/signup', (req, res) => {
                   res.status(201).send(token);
               }).catch((error) => {
                 res.status(500).send(error);
-              })
+              });
+
+          // After user creation, make their friends list. Do this after sending the token for speed.
+          const friends_ref = db.ref(`friends/${user.uid}`)
+          friends_ref.set("")
+              .then((message) => {
+                  console.log(message);
+              }).catch((error) => {
+                console.log(error);
+          });
       })
       .catch((error) => {
         // Error creating user
@@ -286,13 +275,18 @@ app.get('/profile', (req, res) => {
         firebaseApp.auth().verifyIdToken(user_in)
             .then((token) => {
                 const uid = token.uid;
+                const friends_ref = db.ref(`friends/${uid}`)
                 firebaseApp.auth().getUser(uid)
                     .then((user) => {
                         let data = {};
                         data['displayName'] = user.displayName;
                         data['uid'] = user.uid;
                         data['photoURL'] = user.photoURL;
-                        res.status(200).send(data);
+                        friends_ref.once('value').then(friends => {
+                            console.log(friends);
+                            data['friends'] = friends;
+                            res.status(200).send(data);
+                        });
                     }).catch((error) => {
                         console.log(error);
                         res.status(500).send("Error finding user");
@@ -307,4 +301,4 @@ app.get('/profile', (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = { usersRouter: app, usersFirebaseInit };
