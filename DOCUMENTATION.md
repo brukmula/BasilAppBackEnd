@@ -620,6 +620,54 @@ This endpoint requires the headers `user` to be the JWT from user authentication
 "No user token was sent"
 ```
 
+### Search users
+Method: GET
+#### /search-users
+Search for a user of the app. Uses the query parameter `query` with a length >= 2. The search is based on both email and
+display name.
+#### Returns
+- Valid query ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+Example: http://localhost:3000/search-users?query=username
+```json
+[
+    {
+        "item": {
+            "uid": "5sjSwq6KClSb12a5Rp56xJrh44C3",
+            "email": "username@email.com",
+            "displayName": "Example Username",
+            "photoURL": "https://httpcats.com/204"
+        },
+        "refIndex": 0
+    },
+    {
+        "item": {
+            "uid": "RfNd5qDTNdeOlqq59QnXmb7xSEF3",
+            "email": "username2@email.com"
+        },
+        "refIndex": 4
+    },
+    {
+        "item": {
+            "uid": "AFDKGthhNKeCx5DtzbmA5XpaSk82",
+            "email": "sahoward42@tntech.edu",
+            "displayName": "newname"
+        },
+        "refIndex": 2
+    },
+    {
+        "item": {
+            "uid": "IlTFW3JUzwX8bwT5fyxYCpqwJGT2",
+            "email": "testuser@email.com"
+        },
+        "refIndex": 3
+    }
+]
+```
+- Invalid length and other query issues ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"Bad query"
+```
+
 ## User endpoint
 ### Roots
 Method: GET, POST
