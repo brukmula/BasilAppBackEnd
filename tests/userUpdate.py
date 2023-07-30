@@ -12,7 +12,8 @@ if __name__ == '__main__':
 
     change_profile_headers = {
         'user': response.text,
-        'displayName': 'Example Username'
+        'displayName': 'Example Username',
+        'photoURL': 'https://httpcats.com/204'
     }
     new_response = requests.post(f"{uri}update-profile", headers=change_profile_headers)
     print(new_response.text)
