@@ -3,7 +3,6 @@ const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const createError = require('http-errors');
 const express = require('express');
 const logger = require('morgan');
 const path = require('path');
@@ -38,9 +37,11 @@ app.use(cors());    // For Cross-Origin Resource Sharing
 app.use(compression());     // For bandwidth saving on the more intensive actions
 
 // view engine setup
+/*
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('caseSensitive', true);
+ */
 
 // Express setup
 app.use(logger('dev'));
@@ -51,7 +52,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Routes usage
-// app.use('/', indexRouter);
 app.use('/api', bibleRouter);
 app.use('/', usersRouter, socialRouter);
 
