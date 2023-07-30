@@ -144,7 +144,9 @@ app.post('/remove-friend', (req, res) => {
                             if (follow_key) {
                                 db.ref(`friends/${uid}/${follow_key}`).remove()
                                     .then((message) => {
-                                        console.log(message);
+                                        if (message) {
+                                            console.log(message);
+                                        }
                                         res.status(200).send(`Successfully unfollowed user ${user_to_unfollow}`);
                                     })
                                     .catch((error) => {
