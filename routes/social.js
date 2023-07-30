@@ -1,5 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const Fuse = require('fuse.js');
+
+const fuseOptions = {keys: ['displayName', 'email']}
+
+function searchForUsers(query, list) {
+    const fuse = new Fuse(list, fuseOptions);
+    return fuse.search(query);
+}
 
 // Firebase things
 let firebase = null;
@@ -14,6 +22,34 @@ function socialFirebaseInit(firebaseIn, firebaseAppIn, dbIn) {
     if (!firebase || !firebaseApp || !db) {
         throw new Error("Invalid initialization");
     }
+}
+
+/** User listing for search
+ *
+ * @returns {*[]} List of users of the app
+ */
+async function listUsers(nextPageToken) {
+
+    // Get all the users of the app, 1000 at a time
+    return await firebaseApp.auth().listUsers(1000, nextPageToken)
+        .then((results) => {
+            // Add the users to the list
+            let users = [];
+            results.users.forEach((userRecord) => {
+                let user_json = userRecord.toJSON();
+                let user = {};
+                user['uid'] = user_json['uid'];
+                user['email'] = user_json['email'];
+                user['displayName'] = user_json['displayName'];
+                user['photoURL'] = user_json['photoURL'];
+                users.push(user);
+            })
+            // Get the token for the next page (if there is another page)
+            if (results.pageToken) {
+                users.concat(listUsers(results.pageToken));
+            }
+            return users;
+        });
 }
 
 // Express setup
@@ -129,6 +165,19 @@ app.post('/remove-friend', (req, res) => {
                 console.log(error);
                 res.status(500).send("Invalid token");
             });
+    }
+});
+
+app.get('/search-users', (req, res) => {
+    const query = req.query['query'];
+    if (query.length >= 2) {
+        listUsers().then((result) => {
+            let searchResult = searchForUsers(query, result)
+            res.send(searchResult);
+        })
+    }
+    else {
+        res.status(400).send("Bad query");
     }
 });
 
