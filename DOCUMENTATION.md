@@ -668,6 +668,76 @@ Example: http://localhost:3000/search-users?query=username
 "Bad query"
 ```
 
+### Feed
+Method: GET
+#### /feed
+This endpoint requires the headers `user` to be the JWT from user authentication
+#### Returns
+- Feed ([200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200))
+Example query: http://127.0.0.1:3000/feed?pageSize=3
+```json
+{
+    "page": 1,
+    "pageCount": 11,
+    "content": [
+        {
+            "book": "Genesis",
+            "chapter": 1,
+            "note": "example note",
+            "shared": true,
+            "tags": {
+                "0": "testing",
+                "1": "one",
+                "2": "two"
+            },
+            "timestamp": "2023-07-31T18:49:40.057Z",
+            "verse": 31,
+            "uid": "RfNd5qDTNdeOlqq59QnXmb7xSEF3"
+        },
+        {
+            "book": "Genesis",
+            "chapter": 1,
+            "note": "example note",
+            "shared": true,
+            "tags": {
+                "0": "testing",
+                "1": "one",
+                "2": "two"
+            },
+            "timestamp": "2023-07-31T18:49:40.005Z",
+            "verse": 30,
+            "uid": "RfNd5qDTNdeOlqq59QnXmb7xSEF3"
+        },
+        {
+            "book": "Genesis",
+            "chapter": 1,
+            "note": "example note",
+            "shared": true,
+            "tags": {
+                "0": "testing",
+                "1": "one",
+                "2": "two"
+            },
+            "timestamp": "2023-07-31T18:49:39.951Z",
+            "verse": 29,
+            "uid": "RfNd5qDTNdeOlqq59QnXmb7xSEF3"
+        }
+    ]
+}
+```
+- Invalid JWT ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Invalid token"
+```
+- Error retrieving the user's feed ([500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500))
+```js
+"Error retrieving feed"
+```
+- No user token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400))
+```js
+"No user token was sent"
+```
+
 ## User endpoint
 ### Roots
 Method: GET, POST
