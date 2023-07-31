@@ -12,7 +12,7 @@ const bibleRouter = require('./routes/bible');
 // const indexRouter = require('./routes/index');
 const { usersRouter, usersFirebaseInit } = require('./routes/users');
 const { socialRouter, socialFirebaseInit } = require('./routes/social');
-const {notesRouter, notesFirebaseInit } = require('./routes/notes')
+const { notesRouter, notesFirebaseInit } = require('./routes/notes')
 
 // Firebase imports
 const firebase = require('firebase');
@@ -55,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes usage
 app.use('/api', bibleRouter);
-app.use('/', usersRouter, socialRouter);
+app.use('/', usersRouter, socialRouter, notesRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).send("Healthy: OK");
