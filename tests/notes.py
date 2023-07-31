@@ -16,7 +16,8 @@ if __name__ == '__main__':
         'book': 'Genesis',
         'chapter': 1,
         'verse': 1,
-        'note': "example note"
+        'note': "example note",
+        'tags': ['testing', 'one', 'two']
     }
     headers = {
         'user': token
@@ -24,3 +25,20 @@ if __name__ == '__main__':
 
     response = requests.post(f"{uri}notes", headers=headers, json=data)
     print(response.text)
+
+    body = {
+        'tag': 'testing'
+    }
+
+    note = requests.get(f"{uri}notes", headers=headers, json=body)
+    print(note.text)
+
+    body2 = {
+        'book': 'Genesis',
+        'chapter': 1,
+        'verse': 1
+    }
+
+    note2 = requests.get(f"{uri}notes", headers=headers, json=body2)
+    print(note2.text)
+
