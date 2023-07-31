@@ -52,6 +52,22 @@ async function listUsers(nextPageToken) {
         });
 }
 
+async function get_shared(uid) {
+    const friend_notes_ref = db.ref(`notes/${uid}`);
+    return await friend_notes_ref.once('value')
+        .then((friend_notes) => {
+            friend_notes = friend_notes.toJSON();
+            let shared = [];
+            for (let note_ref in friend_notes) {
+                if (friend_notes[note_ref]['shared']) {
+                    friend_notes[note_ref]['uid'] = uid;
+                    shared.push(friend_notes[note_ref]);
+                }
+            }
+            return shared;
+        });
+}
+
 // Express setup
 const app = express.Router();
 
@@ -182,5 +198,43 @@ app.get('/search-users', (req, res) => {
         res.status(400).send("Bad query");
     }
 });
+
+app.get('/feed', (req, res) => {
+    const user_in = req.header('user');
+
+    if (!user_in) {
+        res.status(400).send("No user token was sent");
+    }
+    else {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const friends_ref = db.ref(`friends/${uid}`);
+
+                friends_ref.once('value')
+                    .then(async (data) => {
+                        data = data.toJSON();
+                        let friends = [];
+
+                        for (let friend_key in data) {
+                            friends.push(data[friend_key]['uid']);
+                        }
+
+                        let posts = [];
+
+                        for (let friend of friends) {
+                            let friend_posts = await get_shared(friend);
+                            if (friend_posts.length) {
+                                Array.prototype.push.apply(posts, friend_posts);
+                            }
+                        }
+
+                        posts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                        res.status(200).send(posts);
+                    });
+            });
+    }
+})
 
 module.exports = { socialRouter: app, socialFirebaseInit };
