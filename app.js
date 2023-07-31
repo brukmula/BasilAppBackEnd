@@ -12,6 +12,7 @@ const bibleRouter = require('./routes/bible');
 // const indexRouter = require('./routes/index');
 const { usersRouter, usersFirebaseInit } = require('./routes/users');
 const { socialRouter, socialFirebaseInit } = require('./routes/social');
+const {notesRouter, notesFirebaseInit } = require('./routes/notes')
 
 // Firebase imports
 const firebase = require('firebase');
@@ -28,6 +29,7 @@ const db = admin.database();
 firebase.initializeApp(firebaseConfig);
 usersFirebaseInit(firebase, firebaseApp, db);
 socialFirebaseInit(firebase, firebaseApp, db);
+notesFirebaseInit(firebase, firebaseApp, db);
 
 // App
 const app = express();
