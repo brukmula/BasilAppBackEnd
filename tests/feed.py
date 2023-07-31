@@ -16,7 +16,10 @@ if __name__ == '__main__':
         'user': token
     }
 
-    feed = requests.get(f"{uri}feed", headers=headers)
+    feed = requests.get(f"{uri}feed?pageSize=3", headers=headers)
     print(json.dumps(feed.json(), indent=4))
+
+    feed2 = requests.get(f"{uri}feed?page=2&pageSize=3", headers=headers)
+    print(json.dumps(feed2.json(), indent=4))
 
 
