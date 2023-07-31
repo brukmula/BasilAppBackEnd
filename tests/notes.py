@@ -6,7 +6,7 @@ uri = "http://127.0.0.1:3000/"
 
 if __name__ == '__main__':
     signin_headers: dict = {
-        'email': 'username@email.com',
+        'email': 'username2@email.com',
         'password': 'password'
     }
     token = requests.post(f"{uri}signin", headers=signin_headers).text
@@ -17,6 +17,7 @@ if __name__ == '__main__':
         'chapter': 1,
         'verse': 1,
         'note': "example note",
+        'shared': True,
         'tags': ['testing', 'one', 'two']
     }
     headers = {
@@ -25,6 +26,11 @@ if __name__ == '__main__':
 
     response = requests.post(f"{uri}notes", headers=headers, json=data)
     print(response.text)
+
+    for i in range(1, 32):
+        data['verse'] = i
+        response = requests.post(f"{uri}notes", headers=headers, json=data)
+        print(response.text)
 
     body = {
         'tag': 'testing'

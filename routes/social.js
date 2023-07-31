@@ -24,6 +24,8 @@ function socialFirebaseInit(firebaseIn, firebaseAppIn, dbIn) {
     }
 }
 
+let feed_cache = {};    // User feed cache
+
 /** User listing for search
  *
  * @returns {*[]} List of users of the app
@@ -49,6 +51,22 @@ async function listUsers(nextPageToken) {
                 users.concat(listUsers(results.pageToken));
             }
             return users;
+        });
+}
+
+async function get_shared(uid) {
+    const friend_notes_ref = db.ref(`notes/${uid}`);
+    return await friend_notes_ref.once('value')
+        .then((friend_notes) => {
+            friend_notes = friend_notes.toJSON();
+            let shared = [];
+            for (let note_ref in friend_notes) {
+                if (friend_notes[note_ref]['shared']) {
+                    friend_notes[note_ref]['uid'] = uid;
+                    shared.push(friend_notes[note_ref]);
+                }
+            }
+            return shared;
         });
 }
 
@@ -182,5 +200,67 @@ app.get('/search-users', (req, res) => {
         res.status(400).send("Bad query");
     }
 });
+
+app.get('/feed', (req, res) => {
+    const user_in = req.header('user');
+    const page = req.query['page'] ? Number(req.query['page']) : 1;
+    const page_size = req.query['pageSize'] ? Number(req.query['pageSize']) : 20;
+
+    if (!user_in) {
+        res.status(400).send("No user token was sent");
+    }
+    else {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;
+                const friends_ref = db.ref(`friends/${uid}`);
+
+                if (page === 0 || !feed_cache[uid]) {
+                    friends_ref.once('value')
+                        .then(async (data) => {
+                            data = data.toJSON();
+                            let friends = [];
+
+                            for (let friend_key in data) {
+                                friends.push(data[friend_key]['uid']);
+                            }
+
+                            let posts = [];
+
+                            for (let friend of friends) {
+                                let friend_posts = await get_shared(friend);
+                                if (friend_posts.length) {
+                                    Array.prototype.push.apply(posts, friend_posts);
+                                }
+                            }
+
+                            posts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                            feed_cache[uid] = posts;
+
+                            res.status(200).send({
+                                'page': page,
+                                'pageCount': Math.ceil(posts.length / page_size),
+                                'content': posts.slice(page * page_size - page_size, page * page_size)
+                            });
+                        }).catch((error) => {
+                            console.log(error);
+                            res.status(500).send("Error retrieving feed");
+                    });
+                }
+                else {
+                    // feed_cache[uid].slice(page * page_size - page_size, page * page_size)
+                    res.status(200).send({
+                        'page': page,
+                        'pageCount': Math.ceil(feed_cache[uid].length / page_size),
+                        'content': feed_cache[uid].slice(page * page_size - page_size, page * page_size)
+                    })
+                }
+            }).catch((error) => {
+                console.log(error);
+                res.status(500).send("Invalid token");
+        });
+    }
+})
 
 module.exports = { socialRouter: app, socialFirebaseInit };
