@@ -22,32 +22,49 @@ app.use(bodyParser.json());
 // POST endpoint to store notes
 // Endpoint for submitting a new note
 app.post('/notes', (req, res) => {
-    const { book, verse, code, tags } = req.body;
+    const user_in = req.header('user'); // JWT to identify the user
+    const { book, chapter, verse, note, tags, shared } = req.body;
 
-    if (!book || !verse || !code) {
-        return res.status(400).json({ error: "Book, verse, and code are required fields." });
+    if (!book || !verse || !note) {
+        return res.status(400).json({ error: "Book, verse, and note are required fields." });
     }
+    else if (!user_in) {
+        res.status(400).json({ error: "No user token was sent"} );
+    }
+    else {
+        // Get the current timestamp
+        const timestamp = new Date().toISOString();
 
-    // Get the current timestamp
-    const timestamp = new Date().toISOString();
+        // Create a new note object
+        const newNote = {
+            book: book,                         // Book reference
+            chapter: chapter,                   // Chapter reference
+            verse: verse,                       // Verse reference
+            note: note,                         // Note text (data)
+            shared: shared ? shared : false,    // For later sharing
+            tags: tags || [],                   // If no tags provided, default to an empty array
+            timestamp: timestamp,               // Timestamp for feed and age purposes
+        };
 
-    // Create a new note object
-    const newNote = {
-        book: book,
-        verse: verse,
-        code: code,
-        tags: tags || [], // If no tags provided, default to an empty array
-        timestamp: timestamp,
-    };
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;                      // User id for DB references
+                const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
 
-    // Save the note to the Firebase database
-    db.collection('notes').add(newNote)
-        .then(() => {
-            return res.status(201).json({ message: "Note saved successfully." });
-        })
-        .catch((error) => {
-            return res.status(500).json({ error: "Failed to save the note." });
-        });
+                const note = {};                         // Workaround for later feed building with the notes
+                note[`${book}_${chapter}_${verse}`] = newNote;
+
+                // Save the note to the Firebase database
+                notes_ref.set(note)
+                    .then(() => {
+                        return res.status(201).json({ message: "Note saved successfully." });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.status(500).json({ error: "Failed to save the note." });
+                    });
+            });
+    }
 });
 
 module.exports = { notesRouter: app, notesFirebaseInit };
