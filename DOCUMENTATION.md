@@ -878,6 +878,113 @@ Invalid token sent ([400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Stat
 ```js
 "Invalid token"
 ```
+## Notes 
+
+Endpoints
+#### 1. POST /notes
+
+Create a new note and save it in the Firebase database for the authenticated user.
+ #### Request
+
+    Method: POST
+    URL: https://your-api-domain.com/notes
+    Headers:
+        user: <JWT Token> (required, authentication token of the user)
+    Body (JSON):
+        book: <String> (required, reference to the book of the note)
+        chapter: <String> (required, reference to the chapter of the note)
+        verse: <String> (optional, reference to the verse of the note)
+        note: <String> (required, the content of the note)
+        shared: <Boolean> (optional, flag to indicate if the note should be shared, default: false)
+        tags: <Array of Strings> (optional, an array of tags associated with the note)
+
+#### Response
+
+    Status: 201 Created
+    Body (JSON):
+        message: "Note saved successfully."
+
+#### Example
+
+javascript
+
+const noteData = {
+  book: "John",
+  chapter: "3",
+  verse: "16",
+  note: "For God so loved the world...",
+  shared: true,
+  tags: ["love", "salvation"]
+};
+
+fetch('https://your-api-domain.com/notes', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'user': 'your_jwt_token_here'
+  },
+  body: JSON.stringify(noteData)
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+
+#### 2. GET /notes
+
+Retrieve notes from the Firebase database for the authenticated user based on specific criteria.
+#### Request
+
+    Method: GET
+    URL: https://your-api-domain.com/notes
+    Headers:
+        user: <JWT Token> (required, authentication token of the user)
+    Query Parameters (choose one):
+        Option 1: Retrieve notes based on book, chapter, and verse:
+            book: <String> (required, reference to the book of the notes)
+            chapter: <String> (required, reference to the chapter of the notes)
+            verse: <String> (optional, reference to the verse of the notes)
+        Option 2: Retrieve notes based on tag:
+            tag: <String> (required, a tag to filter notes)
+
+#### Response
+
+    Status: 200 OK
+    Body (JSON):
+        An object containing notes data based on the provided criteria.
+
+#### Example
+
+javascript
+
+// Example 1: Retrieve notes for book "John" and chapter "3"
+fetch('https://your-api-domain.com/notes?book=John&chapter=3', {
+  method: 'GET',
+  headers: {
+    'user': 'your_jwt_token_here'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+
+// Example 2: Retrieve notes for a specific tag "love"
+fetch('https://your-api-domain.com/notes?tag=love', {
+  method: 'GET',
+  headers: {
+    'user': 'your_jwt_token_here'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+
+#### Error Responses
+
+If there are any errors during the process, the API will respond with appropriate error messages and status codes. These errors may include:
+
+    400 Bad Request: When required parameters are missing or invalid.
+    401 Unauthorized: When the user is not authenticated or the JWT token is invalid.
+    500 Internal Server Error: For any server-related issues.
 
 ## Internal
 ### Health check
