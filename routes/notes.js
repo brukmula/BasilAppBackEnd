@@ -25,8 +25,8 @@ app.post('/notes', (req, res) => {
     const user_in = req.header('user'); // JWT to identify the user
     const { book, chapter, verse, note, tags, shared } = req.body;
 
-    if (!book || !verse || !note) {
-        return res.status(400).json({ error: "Book, verse, and note are required fields." });
+    if (!book || !chapter || !note) {
+        return res.status(400).json({ error: "book, chapter, and note are required fields." });
     }
     else if (!user_in) {
         res.status(400).json({ error: "No user token was sent"} );
@@ -63,6 +63,58 @@ app.post('/notes', (req, res) => {
                         console.log(error);
                         return res.status(500).json({ error: "Failed to save the note." });
                     });
+            });
+    }
+});
+
+app.get('/notes', (req, res) => {
+    const user_in = req.header('user'); // JWT to identify the user
+    const { book, chapter, verse, tag } = req.body;
+
+    if (!(book && chapter) && !tag) {
+        return res.status(400).json({ error: "book and verse or tag are required fields." });
+    }
+    else if (!user_in) {
+        res.status(400).json({ error: "No user token was sent"} );
+    }
+    else {
+        firebaseApp.auth().verifyIdToken(user_in)
+            .then((token) => {
+                const uid = token.uid;                      // User id for DB references
+
+                if (!tag) {
+                    const notes_ref = db.ref(`notes/${uid}/${book}_${chapter}_${verse}`);   // User's notes reference
+                    notes_ref.once('value')
+                        .then((data) => {
+                            res.status(200).json(data.toJSON());
+                        }).catch((error) => {
+                            console.log(error);
+                            res.status(500).json({error: "Error retrieving note"});
+                    })
+                }
+                else {
+                    const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
+                    notes_ref.once('value')
+                        .then((data) => {
+                            data = data.toJSON();
+
+                            let note_matches = [];
+
+                            for (let note in data) {
+                                for (let data_tag in data[note]['tags']) {
+                                    if (tag === data[note]['tags'][data_tag]) {
+                                        note_matches.push(data[note]);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            res.status(200).send(note_matches);
+                        }).catch((error) => {
+                            console.log(error);
+                            res.status(500).json({error: "Error retrieving note"});
+                    })
+                }
             });
     }
 });
