@@ -51,11 +51,8 @@ app.post('/notes', (req, res) => {
                 const uid = token.uid;                      // User id for DB references
                 const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
 
-                const note = {};                         // Workaround for later feed building with the notes
-                note[`${book}_${chapter}_${verse}`] = newNote;
-
                 // Save the note to the Firebase database
-                notes_ref.set(note)
+                notes_ref.child(`${book}_${chapter}_${verse}`).set(newNote)
                     .then(() => {
                         return res.status(201).json({ message: "Note saved successfully." });
                     })
