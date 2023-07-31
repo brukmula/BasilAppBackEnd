@@ -37,21 +37,21 @@ app.post('/notes', (req, res) => {
 
         // Create a new note object
         const newNote = {
-            book: book,
-            chapter: chapter,
-            verse: verse,
-            note: note,
+            book: book,                         // Book reference
+            chapter: chapter,                   // Chapter reference
+            verse: verse,                       // Verse reference
+            note: note,                         // Note text (data)
             shared: shared ? shared : false,    // For later sharing
-            tags: tags || [], // If no tags provided, default to an empty array
-            timestamp: timestamp,
+            tags: tags || [],                   // If no tags provided, default to an empty array
+            timestamp: timestamp,               // Timestamp for feed and age purposes
         };
 
         firebaseApp.auth().verifyIdToken(user_in)
             .then((token) => {
-                const uid = token.uid;
-                const notes_ref = db.ref(`notes/${uid}`);
+                const uid = token.uid;                      // User id for DB references
+                const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
 
-                const note = {};
+                const note = {};                         // Workaround for later feed building with the notes
                 note[`${book}_${chapter}_${verse}`] = newNote;
 
                 // Save the note to the Firebase database
