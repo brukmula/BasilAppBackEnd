@@ -1015,6 +1015,7 @@ Retrieve notes from the Firebase database for the authenticated user based on sp
             verse: <String> (optional, reference to the verse of the notes)
         Option 2: Retrieve notes based on tag:
             tag: <String> (required, a tag to filter notes)
+        Option 3: Retrieve all of a user's notes (no parameters)
 
 #### Response
 
