@@ -67,11 +67,8 @@ app.post('/notes', (req, res) => {
 app.get('/notes', (req, res) => {
     const user_in = req.header('user'); // JWT to identify the user
     const { book, chapter, verse, tag } = req.query;
-
-    if (!(book && chapter) && !tag) {
-        return res.status(400).json({ error: "book and verse or tag are required fields." });
-    }
-    else if (!user_in) {
+ 
+    if (!user_in) {
         res.status(400).json({ error: "No user token was sent"} );
     }
     else {
@@ -79,7 +76,7 @@ app.get('/notes', (req, res) => {
             .then((token) => {
                 const uid = token.uid;                      // User id for DB references
 
-                if (!tag) {
+                if (book && chapter && verse) {
                     const notes_ref = db.ref(`notes/${uid}/${book}_${chapter}_${verse}`);   // User's notes reference
                     notes_ref.once('value')
                         .then((data) => {
@@ -88,8 +85,7 @@ app.get('/notes', (req, res) => {
                             console.log(error);
                             res.status(500).json({error: "Error retrieving note"});
                     })
-                }
-                else {
+                } else if (tag) {
                     const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
                     notes_ref.once('value')
                         .then((data) => {
@@ -107,6 +103,16 @@ app.get('/notes', (req, res) => {
                             }
 
                             res.status(200).send(note_matches);
+                        }).catch((error) => {
+                            console.log(error);
+                            res.status(500).json({error: "Error retrieving note"});
+                    })
+                }
+                else {
+                    const notes_ref = db.ref(`notes/${uid}`);   // User's notes reference
+                    notes_ref.once('value')
+                        .then((data) => {
+                            res.status(200).json(data.toJSON());
                         }).catch((error) => {
                             console.log(error);
                             res.status(500).json({error: "Error retrieving note"});
