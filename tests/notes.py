@@ -48,3 +48,7 @@ if __name__ == '__main__':
     note2 = requests.get(f"{uri}notes", headers=headers, json=body2)
     print(note2.text)
 
+
+    allNotes = requests.get(f"{uri}notes", headers=headers)
+    print(allNotes.text)
+
