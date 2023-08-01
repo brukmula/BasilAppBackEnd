@@ -66,9 +66,9 @@ app.post('/notes', (req, res) => {
 
 app.get('/notes', (req, res) => {
     const user_in = req.header('user'); // JWT to identify the user
-    const { book, chapter, verse, tag } = req.body;
+    const { book, chapter, verse, tag } = req.query;
 
-    if (!(book && chapter) || !tag) {
+    if (!(book && chapter) && !tag) {
         return res.status(400).json({ error: "book and verse or tag are required fields." });
     }
     else if (!user_in) {
